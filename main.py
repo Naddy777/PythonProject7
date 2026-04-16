@@ -17,5 +17,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-
+name = input("Введите имя: ")
+print("Привет,", name)
 
