@@ -1,6 +1,5 @@
-from dz3_3 import format_file_size, format_file_size1
+from dz3_3 import format_file_size1
 import pytest
-
 
 @pytest.mark.parametrize("size, expected", [
     # --- Граничные значения и нули ---
@@ -30,21 +29,21 @@ import pytest
     (1100, "1.1 KB"),  # 1100 / 1024 ≈ 1.074 -> 1.1 (при обычном округлении)
     (2000, "2.0 KB"),  # 2000 / 1024 ≈ 1.953 -> 2.0
 ])
-def test_format_file_size_positive(size, expected):
+def test_format_file_size_positive1(size, expected):
     """Тестирование корректных входных данных и переходов единиц."""
-    assert format_file_size(size) == expected
+    assert format_file_size1(size) == expected
 
 
-def test_format_file_size_negative():
+def test_format_file_size_negative1():
     """Проверка генерации исключения при отрицательном значении."""
     with pytest.raises(ValueError):
-        format_file_size(-1)
+        format_file_size1(-1)
 
 
-def test_format_file_size_large_negative():
+def test_format_file_size_large_negative1():
     """Проверка генерации исключения при больших отрицательных числах."""
     with pytest.raises(ValueError):
-        format_file_size(-1024)
+        format_file_size1(-1024)
 
 
 @pytest.mark.parametrize("invalid_input", [
@@ -58,6 +57,4 @@ def test_format_file_size_wrong_types(invalid_input):
     Хотя в ТЗ указан int, в автотестах полезно проверять реакцию на TypeError.
     """
     with pytest.raises(TypeError):
-        format_file_size(invalid_input)
-
-
+        format_file_size1(invalid_input)
