@@ -1,23 +1,20 @@
 class Money:
     def __init__(self, rub, kop):
-        # Приводим копейки к нормальному виду (от -99 до 99)
-        total_kop = rub * 100 + kop
+        # Сначала нормализуем копейки в диапазон от -99 до 99
+        rub += kop // 100
+        kop = kop % 100
 
-        # Корректная нормализация для отрицательных чисел
-        if total_kop >= 0:
-            self.rub = total_kop // 100
-            self.kop = total_kop % 100
-        else:
-            # Для отрицательных чисел нужно особое поведение
-            # Например: -150 копеек = -1 рубль -50 копеек
-            self.rub = -((-total_kop) // 100) if total_kop % 100 == 0 else -((-total_kop) // 100) - 1
-            self.kop = abs(total_kop) % 100
-            if total_kop % 100 != 0:
-                self.kop = 100 - self.kop if self.kop != 0 else 0
-                self.kop = -self.kop if self.kop != 0 else 0
+        # Если рубль отрицательный и копейки положительные, корректируем
+        if rub < 0 and kop > 0:
+            rub += 1
+            kop -= 100
+        elif rub > 0 and kop < 0:
+            rub -= 1
+            kop += 100
 
-        # Альтернативный, более простой подход (рекомендую его):
-        # Используем математическую нормализацию через divmod
+        # Если оба отрицательные, копейки уже в правильном диапазоне
+        self.rub = rub
+        self.kop = kop
 
     def _to_kopecks(self):
         """Преобразует сумму в копейки"""
@@ -25,20 +22,15 @@ class Money:
 
     @classmethod
     def _from_kopecks(cls, kopecks):
-        """Создает объект Money из копеек с правильной нормализацией"""
-        # Нормализуем копейки в рубли и копейки
-        if kopecks >= 0:
-            rub = kopecks // 100
-            kop = kopecks % 100
-        else:
-            # Для отрицательных чисел
-            rub = -((-kopecks) // 100) if kopecks % 100 == 0 else -((-kopecks) // 100) - 1
-            kop = abs(kopecks) % 100
-            if kopecks % 100 != 0 and kop != 0:
-                kop = 100 - kop
-                kop = -kop
-            elif kop == 0:
-                kop = 0
+        """Создает объект Money из копеек"""
+        rub = kopecks // 100
+        kop = kopecks % 100
+
+        # Корректировка для отрицательных копеек
+        if kop < 0:
+            rub += 1
+            kop += 100
+
         return cls(rub, kop)
 
     def __add__(self, other):
@@ -52,8 +44,8 @@ class Money:
         return NotImplemented
 
     def __mul__(self, other):
-        if isinstance(other, int):
-            return Money._from_kopecks(self._to_kopecks() * other)
+        if isinstance(other, (int, float)):
+            return Money._from_kopecks(int(self._to_kopecks() * other))
         return NotImplemented
 
     def __rmul__(self, other):
@@ -172,3 +164,8 @@ if __name__ == "__main__":
     # Тест на все операции сравнения
     print(f"{m2} < {m3}: {m2 < m3}")  # True
     print(f"{m2} > {m3}: {m2 > m3}")  # False
+
+    # Проверка отрицательных сумм
+    print("Тест 1:", Money(-10, 50))  # -9руб 50коп
+    print("Тест 2:", Money(-5, 150))  # -3руб 50коп
+    print("Тест 3:", Money(-10, -50))  # -10руб -50коп
