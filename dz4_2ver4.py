@@ -28,11 +28,21 @@ class Money:
         if not isinstance(other, int):
             return NotImplemented
 
-        # Умножаем общую сумму в копейках на число
-        total_kop = (self.rub * 100 + self.kop) * other
-        # Если множитель отрицательный, меняем знак суммы
-        if other < 0:
-            total_kop = -total_kop
+        # 1. Определяем исходный знак суммы
+        current_sign = -1 if self.is_negative else 1
+
+        # 2. Определяем знак множителя
+        multiplier_sign = -1 if other < 0 else 1
+
+        # 3. Итоговый знак = произведение исходного знака и знака множителя
+        final_sign = current_sign * multiplier_sign
+
+        # 4. Работаем с абсолютным значением суммы в копейках
+        abs_total_kop = self.rub * 100 + self.kop
+
+        # 5. Умножаем и применяем итоговый знак
+        total_kop = abs_total_kop * abs(other) * final_sign
+
         return Money(0, total_kop)
 
     def __rmul__(self, other):
@@ -49,8 +59,7 @@ class Money:
         other_val = - (other.rub * 100 + other.kop) if other.is_negative else (other.rub * 100 + other.kop)
         return self_val < other_val
 
-    # Остальные сравнения можно не реализовывать вручную,
-    # если подключить модуль functools.total_ordering,
+
     # но для простоты тестов достаточно этих двух.
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -98,6 +107,11 @@ if __name__ == "__main__":
     money_result = money_sum * 3
     print(money_result)  # 46руб 50коп
 
+    money_sum = Money(10, 50)
+    money_result = money_sum * (-3)
+    print(money_result)  # -31руб 50коп
+
+    money_sum = Money(15, 50)
     money_result = 2 * money_sum
     print(money_result)  # 31руб 0коп
 
