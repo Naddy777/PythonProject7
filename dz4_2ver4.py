@@ -1,25 +1,20 @@
 class Money:
     def __init__(self, rub, kop):
-        # 1. Приводим всё к копейкам, чтобы работать с одним числом
-        # Это гарантирует корректную работу с отрицательными значениями
+
         total_kop = rub * 100 + kop
 
-        # 2. Сохраняем знак всей суммы (отрицательная сумма = долг)
         self.is_negative = total_kop < 0
 
-        # 3. Работаем с абсолютным значением для вычисления рублей и копеек
         abs_total = abs(total_kop)
         self.rub = abs_total // 100
         self.kop = abs_total % 100
 
     def __add__(self, other):
-        # При сложении/вычитании переводим всё в копейки, считаем, и создаем новый объект
         total_kop_self = (-1 if self.is_negative else 1) * (self.rub * 100 + self.kop)
         total_kop_other = (-1 if other.is_negative else 1) * (other.rub * 100 + other.kop)
         return Money(0, total_kop_self + total_kop_other)
 
     def __sub__(self, other):
-        # Вычитание — это сложение с отрицательным числом
         total_kop_self = (-1 if self.is_negative else 1) * (self.rub * 100 + self.kop)
         total_kop_other = (-1 if other.is_negative else 1) * (other.rub * 100 + other.kop)
         return Money(0, total_kop_self - total_kop_other)
@@ -28,19 +23,14 @@ class Money:
         if not isinstance(other, int):
             return NotImplemented
 
-        # 1. Определяем исходный знак суммы
         current_sign = -1 if self.is_negative else 1
 
-        # 2. Определяем знак множителя
         multiplier_sign = -1 if other < 0 else 1
 
-        # 3. Итоговый знак = произведение исходного знака и знака множителя
         final_sign = current_sign * multiplier_sign
 
-        # 4. Работаем с абсолютным значением суммы в копейках
         abs_total_kop = self.rub * 100 + self.kop
 
-        # 5. Умножаем и применяем итоговый знак
         total_kop = abs_total_kop * abs(other) * final_sign
 
         return Money(0, total_kop)
@@ -48,7 +38,6 @@ class Money:
     def __rmul__(self, other):
         return self.__mul__(other)
 
-    # Методы сравнения (сравниваем абсолютные значения с учетом знака)
     def __eq__(self, other):
         return (self.rub == other.rub and
                 self.kop == other.kop and
@@ -59,8 +48,6 @@ class Money:
         other_val = - (other.rub * 100 + other.kop) if other.is_negative else (other.rub * 100 + other.kop)
         return self_val < other_val
 
-
-    # но для простоты тестов достаточно этих двух.
     def __ne__(self, other):
         return not self.__eq__(other)
 
@@ -75,7 +62,6 @@ class Money:
 
     def __str__(self):
         sign = '-' if self.is_negative else ''
-        # Если копейки равны 0, выводим просто "0коп", иначе — с ведущим нулём
         kop_str = str(self.kop) if self.kop != 0 else '0'
         return f"{sign}{abs(self.rub)}руб {kop_str}коп"
 
