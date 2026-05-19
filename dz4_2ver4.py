@@ -66,11 +66,8 @@ class Money:
 
     def __str__(self):
         sign = '-' if self.is_negative else ''
-
-        # Форматирование копеек: если копейки == 0, выводим "0коп" (без нуля впереди),
-        # иначе всегда два знака (например, "5коп" -> "05коп" не нужно по тесту).
-        kop_str = f"{self.kop:02d}" if self.kop != 0 else str(self.kop)
-
+        # Если копейки равны 0, выводим просто "0коп", иначе — с ведущим нулём
+        kop_str = str(self.kop) if self.kop != 0 else '0'
         return f"{sign}{abs(self.rub)}руб {kop_str}коп"
 
 if __name__ == "__main__":
